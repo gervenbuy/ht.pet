@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paws & Soul | 給毛孩最好的生活體驗</title>
+    
+    <!-- Tailwind CSS (樣式庫) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (字體) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons (圖示) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 網站配色設定 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f9fafb',
+                            100: '#f4f5f4', // 淺灰綠
+                            200: '#e6e8e6',
+                            300: '#d1d6d1',
+                            500: '#849b87', // 鼠尾草綠 (主色)
+                            600: '#687d6b',
+                            700: '#506052',
+                            800: '#3e4a40',
+                            900: '#1a201b',
+                        },
+                        accent: {
+                            light: '#fdf6e3', // 奶油色
+                            DEFAULT: '#d97706', // 溫暖橘 (點綴)
+                        },
+                        line: {
+                            DEFAULT: '#06C755', // LINE 官方綠色
+                            hover: '#05b34c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 全域樣式 */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Hero 背景圖 (已更新為指定圖片) */
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('https://i.meee.com.tw/RvJOWNg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 視差滾動效果 */
+        }
+
+        /* 互動效果 */
+        .category-card:hover .category-img {
+            transform: scale(1.05);
+        }
+
+        /* 隱藏捲軸但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 彈窗內容滾動條美化 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d6d1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #849b87; }
+    </style>
+</head>
+<body class="bg-brand-50 text-brand-900 antialiased">
+
+    <!-- LINE 懸浮客服按鈕 -->
+    <a href="https://lin.ee/4R8gwMC" target="_blank" class="fixed bottom-6 right-6 z-50 bg-line hover:bg-line-hover text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center group border-2 border-white">
+        <!-- LINE SVG Icon -->
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.29,9.36c0-4.63-4.99-8.39-11.14-8.39S0.01,4.72,0.01,9.36c0,4.16,3.68,7.63,8.78,8.22l-0.85,3.95c-0.12,0.66,0.59,1.07,1.04,0.61l5.48-5.35c4.76-0.65,7.84-3.69,7.84-7.43Z"/>
+        </svg>
+        <!-- Tooltip -->
+        <span class="absolute right-full mr-4 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none transform translate-x-2 group-hover:translate-x-0">
+            聯絡 LINE 客服
+            <span class="absolute top-1/2 -right-1 w-2 h-2 bg-white transform -translate-y-1/2 rotate-45"></span>
+        </span>
+    </a>
+
+    <!-- 購物車通知 Toast -->
+    <div id="toast" class="fixed top-24 right-5 z-50 bg-white border-l-4 border-brand-500 shadow-xl rounded-md p-4 hidden flex items-center gap-3 transform transition-all duration-300 translate-x-full">
+        <div class="text-brand-500">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <h4 class="font-bold text-sm text-gray-800">已加入購物車</h4>
+            <p class="text-xs text-gray-500" id="toast-message">商品已成功加入您的購物籃。</p>
+        </div>
+    </div>
+
+    <!-- Navigation 導航列 -->
+    <header class="fixed w-full z-40 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="lg:hidden text-brand-800 hover:text-brand-600">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 group">
+                    <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center justify-center text-white">
+                        <i data-lucide="paw-print" class="w-6 h-6 fill-current"></i>
+                    </div>
+                    <span class="text-2xl font-serif font-bold tracking-tight text-brand-800 group-hover:text-brand-600 transition">Paws & Soul</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-brand-700">
+                    <a href="#home" class="hover:text-brand-500 transition-colors">首頁</a>
+                    <a href="#categories" class="hover:text-brand-500 transition-colors">熱門分類</a>
+                    <a href="#products" class="hover:text-brand-500 transition-colors">精選商品</a>
+                    <a href="#story" class="hover:text-brand-500 transition-colors">品牌故事</a>
+                </nav>
+
+                <!-- Icons -->
+                <div class="flex items-center gap-4 text-brand-800">
+                    <button class="relative hover:text-brand-500 transition group" id="cart-btn">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu (Hidden) -->
+        <div id="mobile-menu" class="hidden bg-white border-t lg:hidden absolute w-full shadow-lg">
+            <nav class="flex flex-col p-4 gap-4 text-brand-700 font-medium">
+                <a href="#home" class="hover:text-brand-500">首頁</a>
+                <a href="#categories" class="hover:text-brand-500">熱門分類</a>
+                <a href="#products" class="hover:text-brand-500">精選商品</a>
+                <a href="#story" class="hover:text-brand-500">品牌故事</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section 主視覺 -->
+    <section id="home" class="relative h-screen min-h-[600px] flex items-center hero-bg">
+        <div class="container mx-auto px-6 relative z-10 text-white">
+            <div class="max-w-2xl fade-in-up">
+                <span class="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider uppercase bg-accent text-white rounded-full shadow-sm">New Collection 2025</span>
+                <h1 class="text-4xl md:text-6xl font-serif font-bold leading-tight mb-6 drop-shadow-lg">
+                    給毛孩 <br>
+                    最純粹的愛與呵護
+                </h1>
+                <p class="text-lg md:text-xl mb-8 opacity-90 font-light leading-relaxed max-w-lg drop-shadow-md">
+                    嚴選天然有機材質與食品，為您的貓狗打造健康、快樂的生活方式。因為他們不僅是寵物，更是家人。
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#products" class="px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-full transition-all transform hover:-translate-y-1 shadow-lg text-center">
+                        立即選購
+                    </a>
+                    <a href="#story" class="px-8 py-4 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border border-white/50 font-medium rounded-full transition-all text-center">
+                        探索品牌
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features / Values 三大特色 -->
+    <section class="py-16 bg-white border-b border-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                <div class="p-6">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600">
+                        <i data-lucide="leaf" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-brand-800">100% 天然有機</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">拒絕化學添加，嚴選對環境與毛孩無害的天然素材。</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-brand-800">嚴格品質把關</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">通過多項國際認證，確保每一口食物、每一個玩具都安全。</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600">
+                        <i data-lucide="truck" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-brand-800">快速配送服務</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">今日下單，最快隔日送達，讓愛不需等待。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories 熱門分類 -->
+    <section id="categories" class="py-20 bg-brand-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-brand-900 mb-4">探索熱門分類</h2>
+                <p class="text-gray-500">依照毛孩的需求，找到最適合的商品</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cat 1 -->
+                <a href="#products" class="group relative overflow-hidden rounded-2xl shadow-md h-80 category-card cursor-pointer block">
+                    <img src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="狗狗專區" class="w-full h-full object-cover transition-transform duration-700 category-img">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2">狗狗專區</h3>
+                            <span class="text-white/80 text-sm group-hover:text-white transition flex items-center gap-1">
+                                瀏覽商品 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Cat 2 -->
+                <a href="#products" class="group relative overflow-hidden rounded-2xl shadow-md h-80 category-card cursor-pointer block">
+                    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="貓咪專區" class="w-full h-full object-cover transition-transform duration-700 category-img">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2">貓咪專區</h3>
+                            <span class="text-white/80 text-sm group-hover:text-white transition flex items-center gap-1">
+                                瀏覽商品 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Cat 3 -->
+                <a href="#products" class="group relative overflow-hidden rounded-2xl shadow-md h-80 category-card cursor-pointer md:col-span-2 lg:col-span-1 block">
+                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="居家與配件" class="w-full h-full object-cover transition-transform duration-700 category-img">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2">居家與配件</h3>
+                            <span class="text-white/80 text-sm group-hover:text-white transition flex items-center gap-1">
+                                瀏覽商品 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section (Dynamic Content) 精選商品區 (動態) -->
+    <section id="products" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4 border-b border-gray-100 pb-6">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-brand-900 mb-2">本月精選</h2>
+                    <p class="text-gray-500">主子們試用後一致好評推薦</p>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-spinner" class="flex justify-center items-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500"></div>
+                <span class="ml-3 text-brand-600 font-medium">資料同步中...</span>
+            </div>
+
+            <!-- Product Grid Container -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 min-h-[300px]">
+                <!-- Javascript will inject content here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Story 品牌故事 -->
+    <section id="story" class="py-20 bg-brand-100">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="w-full lg:w-1/2">
+                    <div class="relative">
+                        <div class="absolute -top-4 -left-4 w-24 h-24 bg-accent/20 rounded-full blur-xl"></div>
+                        <img src="https://images.unsplash.com/photo-1534361960057-19889db9621e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Brand Story" class="rounded-2xl shadow-xl relative z-10 w-full transform hover:scale-[1.01] transition duration-500">
+                        <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-lg z-20 hidden md:block">
+                            <p class="font-serif text-2xl font-bold text-brand-800">10+</p>
+                            <p class="text-sm text-gray-500">年專業獸醫顧問團隊</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2">
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-brand-900 mb-6">關於 Paws & Soul</h2>
+                    <h3 class="text-xl text-brand-600 mb-4 font-medium">從「家人」的角度出發，重新定義寵物用品</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        我們是一群熱愛毛孩的設計師與獸醫。創立品牌的初衷很簡單：市面上的產品，不夠好到讓我們放心給自己的寵物使用。
+                    </p>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        因此，我們堅持「人食等級」的原料標準，以及融入居家美學的設計風格。每一款產品，都經過無數次的測試與改良，只為了看見他們滿足的表情。
+                    </p>
+                    <a href="#" class="inline-flex items-center text-brand-800 font-bold border-b-2 border-accent hover:text-accent transition pb-1">
+                        閱讀更多故事 <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials 真實回饋 -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-serif font-bold text-brand-900 mb-12">毛爸媽的真實回饋</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="bg-brand-50 p-8 rounded-2xl hover:shadow-lg transition">
+                    <div class="flex justify-center mb-4 text-accent">
+                        <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
+                    </div>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"自從換了這裡的飼料，我家挑嘴的豆豆每餐都吃光光，毛色也變得很亮！包裝設計也很有質感。"</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                        <div class="text-left">
+                            <p class="font-bold text-brand-800 text-sm">陳小姐 & 豆豆</p>
+                            <p class="text-xs text-gray-500">台北市</p>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Review 2 -->
+                 <div class="bg-brand-50 p-8 rounded-2xl hover:shadow-lg transition">
+                    <div class="flex justify-center mb-4 text-accent">
+                        <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
+                    </div>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"活水機超級安靜，而且很好清洗。客服的回覆速度很快，讓人很安心的購物體驗。"</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                        <div class="text-left">
+                            <p class="font-bold text-brand-800 text-sm">林先生 & 咪咪</p>
+                            <p class="text-xs text-gray-500">台中市</p>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Review 3 -->
+                 <div class="bg-brand-50 p-8 rounded-2xl hover:shadow-lg transition">
+                    <div class="flex justify-center mb-4 text-accent">
+                        <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
+                    </div>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"玩具的耐咬程度出乎意料的好！這是我在網路上買過品質最好的寵物用品店。"</p>
+                    <div class="flex items-center justify-center gap-3">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                        <div class="text-left">
+                            <p class="font-bold text-brand-800 text-sm">王小姐 & Golden</p>
+                            <p class="text-xs text-gray-500">高雄市</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter 電子報 -->
+    <section class="py-16 bg-brand-800 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold mb-4">加入 Paws & Soul 會員</h2>
+            <p class="text-brand-200 mb-8 max-w-lg mx-auto">訂閱我們的電子報，獲取最新寵物健康資訊以及首購 9 折優惠代碼。</p>
+            <form class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto" onsubmit="event.preventDefault(); alert('感謝您的訂閱！優惠碼已寄送至您的信箱。');">
+                <input type="email" placeholder="請輸入您的 Email" class="px-6 py-3 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-accent w-full border-none">
+                <button class="px-8 py-3 bg-accent hover:bg-yellow-600 text-white font-bold rounded-full transition shadow-lg w-full sm:w-auto transform active:scale-95">
+                    免費訂閱
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer 頁尾 -->
+    <footer class="bg-brand-900 text-brand-300 py-12 border-t border-brand-800">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-1 md:col-span-1">
+                    <a href="#" class="flex items-center gap-2 mb-4 text-white">
+                        <i data-lucide="paw-print" class="w-6 h-6"></i>
+                        <span class="text-xl font-serif font-bold">Paws & Soul</span>
+                    </a>
+                    <p class="text-sm leading-relaxed mb-4">
+                        致力於提供最高品質的寵物生活選物，讓毛孩與您的生活更美好。
+                    </p>
+                    <div class="flex gap-4 items-center">
+                        <a href="#" class="hover:text-white transition transform hover:scale-110"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                        <a href="#" class="hover:text-white transition transform hover:scale-110"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                        <!-- LINE Icon in Footer Social -->
+                        <a href="https://lin.ee/4R8gwMC" target="_blank" class="hover:text-line transition transform hover:scale-110 text-brand-300">
+                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.29,9.36c0-4.63-4.99-8.39-11.14-8.39S0.01,4.72,0.01,9.36c0,4.16,3.68,7.63,8.78,8.22l-0.85,3.95c-0.12,0.66,0.59,1.07,1.04,0.61l5.48-5.35c4.76-0.65,7.84-3.69,7.84-7.43Z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">購物指南</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">如何購買</a></li>
+                        <li><a href="#" class="hover:text-white transition">運送政策</a></li>
+                        <li><a href="#" class="hover:text-white transition">退換貨說明</a></li>
+                        <li><a href="#" class="hover:text-white transition">常見問題</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">關於我們</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#story" class="hover:text-white transition">品牌故事</a></li>
+                        <li><a href="#" class="hover:text-white transition">實體門市</a></li>
+                        <li><a href="#" class="hover:text-white transition">人才招募</a></li>
+                        <li><a href="#" class="hover:text-white transition">隱私權政策</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4">聯絡我們</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 mt-1 flex-shrink-0 text-accent"></i>
+                            <span>台北市信義區寵物大道 101 號</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="phone" class="w-4 h-4 flex-shrink-0 text-accent"></i>
+                            <span>(02) 2345-6789</span>
+                        </li>
+                         <li class="flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="flex-shrink-0 text-accent" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.29,9.36c0-4.63-4.99-8.39-11.14-8.39S0.01,4.72,0.01,9.36c0,4.16,3.68,7.63,8.78,8.22l-0.85,3.95c-0.12,0.66,0.59,1.07,1.04,0.61l5.48-5.35c4.76-0.65,7.84-3.69,7.84-7.43Z"/>
+                            </svg>
+                            <a href="https://lin.ee/4R8gwMC" target="_blank" class="hover:text-line transition">LINE 線上客服</a>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="mail" class="w-4 h-4 flex-shrink-0 text-accent"></i>
+                            <span>service@pawsandsoul.tw</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-brand-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs">
+                <p>&copy; 2025 Paws & Soul. All rights reserved.</p>
+                <p class="mt-2 md:mt-0 flex items-center gap-1 opacity-70">
+                    Powered by <span class="text-white font-bold">電商神助手</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal 商品詳情彈窗 (全新優化版) -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <!-- 
+            優化重點：
+            1. h-[90vh]: 固定高度，避免視窗太長
+            2. flex-col md:flex-row: 電腦版左右分欄
+        -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] overflow-hidden flex flex-col md:flex-row relative transform scale-95 transition-transform duration-300" id="modal-content">
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-white/80 p-2 rounded-full hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                <i data-lucide="x" class="w-6 h-6 text-gray-600"></i>
+            </button>
+            
+            <!-- Dynamic Content Body -->
+            <div id="modal-body" class="w-full flex flex-col md:flex-row h-full"></div>
+        </div>
+    </div>
+
+    <!-- 邏輯腳本 Scripts -->
+    <script>
+        // 0. 初始化 Icons
+        lucide.createIcons();
+
+        // 1. Mobile Menu Logic
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // 2. Sticky Navbar Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md', 'py-2');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.remove('shadow-md', 'py-2');
+                navbar.classList.add('py-4');
+            }
+        });
+
+        // 3. Google Sheet Integration Logic
+        const SHEET_ID = '1cD5D9RuxfCEm5yabbPmI1t_dqVE7kmeSgf8x3TA_TfE'; 
+        const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=工作表1`;
+        let allProducts = [];
+
+        // Fetch Data
+        async function fetchProducts() {
+            const grid = document.getElementById('product-grid');
+            const loader = document.getElementById('loading-spinner');
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("API response error");
+                
+                const csvText = await response.text();
+                allProducts = parseCSVToJSON(csvText);
+                
+                loader.style.display = 'none';
+
+                if (allProducts.length === 0) {
+                    grid.innerHTML = '<p class="text-center w-full col-span-4 text-gray-500 py-10">目前沒有商品上架。</p>';
+                    return;
+                }
+
+                renderProducts(allProducts);
+
+            } catch (error) {
+                console.error('Error:', error);
+                loader.style.display = 'none';
+                grid.innerHTML = `
+                    <div class="col-span-full text-center text-red-500 bg-red-50 p-6 rounded-lg border border-red-200">
+                        <h3 class="font-bold mb-2">無法讀取商品</h3>
+                        <p class="text-sm text-gray-600">請確認 Google Sheet 已發布，且工作表名稱為「工作表1」。</p>
+                    </div>
+                `;
+            }
+        }
+
+        // CSV Parser
+        function parseCSVToJSON(csvText) {
+            const rows = [];
+            let currentRow = [];
+            let currentCell = '';
+            let inQuote = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i+1];
+                
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentCell += '"'; 
+                        i++;
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentCell.trim());
+                    currentCell = '';
+                } else if ((char === '\r' || char === '\n') && !inQuote) {
+                    if (currentCell || currentRow.length > 0) currentRow.push(currentCell.trim());
+                    if (currentRow.length > 0) rows.push(currentRow);
+                    currentRow = [];
+                    currentCell = '';
+                    if (char === '\r' && nextChar === '\n') i++;
+                } else {
+                    currentCell += char;
+                }
+            }
+            if (currentCell || currentRow.length > 0) {
+                currentRow.push(currentCell.trim());
+                rows.push(currentRow);
+            }
+
+            if (rows.length < 2) return [];
+            
+            const headers = rows[0].map(h => h.trim());
+            const data = rows.slice(1);
+            
+            return data.map(row => {
+                let obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index] || '';
+                });
+                return obj;
+            });
+        }
+
+        // Render Products Grid
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            products.forEach((product, index) => {
+                const title = product['title'] || product['品項'] || '未命名商品';
+                const price = product['price'] || product['特惠價'] || '0';
+                const originalPrice = product['origin_price'] || product['定價'];
+                const desc = product['description'] || product['產品說明'] || '';
+                const img1 = fixImgUrl(product['image'] || product['圖1']);
+                const tag = product['tag'] || ''; 
+                
+                // Tag Logic
+                let tagHtml = '';
+                const pPrice = parseInt(String(price).replace(/[^0-9]/g, '')) || 0;
+                const pOrig = parseInt(String(originalPrice || '').replace(/[^0-9]/g, '') || 0);
+
+                if (tag) {
+                    tagHtml = `<span class="absolute top-3 left-3 bg-brand-500 text-white text-xs font-bold px-2 py-1 rounded shadow">${tag}</span>`;
+                } else if (originalPrice && pPrice < pOrig) {
+                    tagHtml = '<span class="absolute top-3 left-3 bg-red-400 text-white text-xs font-bold px-2 py-1 rounded shadow">SALE</span>';
+                }
+
+                const card = `
+                    <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 overflow-hidden cursor-pointer flex flex-col h-full fade-in-up" onclick="openModal(${index})">
+                        <div class="relative h-64 overflow-hidden bg-gray-100">
+                            <img src="${img1}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                            ${tagHtml}
+                            <button onclick="event.stopPropagation(); addToCart('${title}')" class="absolute bottom-3 right-3 bg-white p-3 rounded-full shadow-md text-brand-800 hover:bg-brand-500 hover:text-white transition translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 duration-300 z-10">
+                                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="font-bold text-lg text-gray-800 mb-1 group-hover:text-brand-600 transition">${title}</h3>
+                            <p class="text-sm text-gray-500 mb-4 line-clamp-2 flex-grow">${desc}</p>
+                            <div class="flex items-end justify-between mt-auto">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-brand-800 text-xl">NT$ ${price}</span>
+                                    ${originalPrice ? `<span class="text-gray-400 text-sm line-through">NT$ ${originalPrice}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+            lucide.createIcons();
+        }
+
+        // Fix Image URLs
+        function fixImgUrl(url) {
+            if (!url) return 'https://via.placeholder.com/400x300?text=No+Image';
+            if (url.includes('drive.google.com')) {
+                const idMatch = url.match(/[-\w]{25,}/);
+                return idMatch ? `https://lh3.googleusercontent.com/d/${idMatch[0]}` : url;
+            }
+            return url.trim();
+        }
+
+        // Modal Logic (New Scrollable Layout)
+        function openModal(index) {
+            const product = allProducts[index];
+            const modal = document.getElementById('product-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalBody = document.getElementById('modal-body');
+
+            const title = product['title'] || product['品項'];
+            const price = product['price'] || product['特惠價'];
+            const originalPrice = product['origin_price'] || product['定價'];
+            const desc = product['description'] || product['產品說明'] || '暫無說明';
+            const img1 = fixImgUrl(product['image'] || product['圖1']);
+            
+            // 🔥 新增 image2 讀取 (支援長條圖)
+            const img2 = fixImgUrl(product['image2'] || product['img2'] || product['圖2'] || product['圖2-說明圖']); 
+            const img3 = fixImgUrl(product['img3'] || product['圖3'] || product['圖3-產品資訊']); 
+
+            let extraImagesHtml = '';
+            
+            // 如果有 img2 (長條圖)，直接滿版顯示
+            if (img2 && img2.length > 5 && !img2.includes('No+Image')) {
+                extraImagesHtml += `
+                    <div class="mt-8 border-t border-gray-100 pt-8">
+                        <img src="${img2}" class="w-full h-auto block rounded-lg" alt="商品詳情圖">
+                    </div>
+                `;
+            }
+            // 如果還有 img3，繼續往下疊加
+            if (img3 && img3.length > 5 && !img3.includes('No+Image')) {
+                 extraImagesHtml += `
+                    <div class="mt-4">
+                        <img src="${img3}" class="w-full h-auto block rounded-lg" alt="更多細節">
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = `
+                <!-- Left Section: Main Image (Fixed/Sticky on Desktop) -->
+                <div class="w-full md:w-1/2 bg-gray-50 flex items-center justify-center bg-gray-100 h-[30vh] md:h-full relative shrink-0">
+                    <img src="${img1}" class="w-full h-full object-cover" alt="${title}">
+                </div>
+                
+                <!-- Right Section: Info & Long Strip (Scrollable) -->
+                <div class="w-full md:w-1/2 h-[60vh] md:h-full overflow-y-auto custom-scrollbar bg-white relative">
+                    <div class="p-8 md:p-10">
+                        <span class="inline-block bg-brand-100 text-brand-600 text-xs font-bold px-2 py-1 rounded mb-3">NEW ARRIVAL</span>
+                        <h2 class="text-3xl font-serif font-bold text-gray-900 mb-4 leading-tight">${title}</h2>
+                        
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-2xl font-bold text-brand-800">NT$ ${price}</span>
+                            ${originalPrice ? `<span class="text-gray-400 text-lg line-through">NT$ ${originalPrice}</span>` : ''}
+                        </div>
+                        
+                        <p class="text-gray-600 leading-relaxed mb-8 text-lg whitespace-pre-line">${desc}</p>
+                        
+                        <!-- Add to Cart Button -->
+                        <button onclick="addToCart('${title}'); closeModal()" class="w-full bg-brand-800 text-white py-4 rounded-full hover:bg-brand-600 transition font-bold shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-1 active:scale-95 duration-200">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
+                            放入購物車
+                        </button>
+
+                        <!-- Long Strip Images Area -->
+                        ${extraImagesHtml}
+                        
+                        <!-- Extra Padding for scroll -->
+                        <div class="h-10"></div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+            
+            lucide.createIcons();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('product-modal');
+            const modalContent = document.getElementById('modal-content');
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Cart Logic
+        let cartCountNum = 0;
+        function addToCart(title) {
+            cartCountNum++;
+            const badge = document.getElementById('cart-count');
+            badge.innerText = cartCountNum;
+            badge.classList.remove('opacity-0');
+            
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            msg.innerText = `已將「${title}」加入購物車`;
+            toast.classList.remove('hidden', 'translate-x-full');
+            toast.classList.add('translate-x-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Initialize Fetch
+        fetchProducts();
+    </script>
+</body>
+</html>
