@@ -309,7 +309,7 @@
         </div>
     </section>
 
-    <!-- Testimonials 真實回饋 -->
+    <!-- Testimonials 真實回饋 (已更新) -->
     <section class="py-20 bg-white">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-3xl font-serif font-bold text-brand-900 mb-12">毛爸媽的真實回饋</h2>
@@ -319,12 +319,10 @@
                     <div class="flex justify-center mb-4 text-accent">
                         <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
                     </div>
-                    <p class="text-gray-600 italic mb-6 leading-relaxed">"這把梳子真的很神奇，除了除臭，梳完毛髮真的很蓬鬆，像剛洗完澡一樣！設計也很有質感。"</p>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"這把梳子真的很神奇，除了除臭，還用紅外線幫狗狗按摩到了，讓狗狗非常有活力！設計也很有質感。"</p>
                     <div class="flex items-center justify-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
-                        <div class="text-left">
-                            <p class="font-bold text-brand-800 text-sm">陳小姐 & 豆豆</p>
-                            <p class="text-xs text-gray-500">台北市</p>
+                        <div class="text-center">
+                            <p class="font-bold text-brand-800 text-sm">新竹縣 林小姐</p>
                         </div>
                     </div>
                 </div>
@@ -333,12 +331,10 @@
                     <div class="flex justify-center mb-4 text-accent">
                         <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
                     </div>
-                    <p class="text-gray-600 italic mb-6 leading-relaxed">"活水機超級安靜，而且很好清洗。客服的回覆速度很快，讓人很安心的購物體驗。"</p>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"使用後確實改善我們家毛孩的體味，讓空氣更清新了，客服的回覆速度很快，讓人很安心的購物體驗。"</p>
                     <div class="flex items-center justify-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
-                        <div class="text-left">
-                            <p class="font-bold text-brand-800 text-sm">林先生 & 咪咪</p>
-                            <p class="text-xs text-gray-500">台中市</p>
+                        <div class="text-center">
+                            <p class="font-bold text-brand-800 text-sm">新竹市 陳先生</p>
                         </div>
                     </div>
                 </div>
@@ -347,12 +343,10 @@
                     <div class="flex justify-center mb-4 text-accent">
                         <i data-lucide="quote" class="w-8 h-8 fill-current opacity-50"></i>
                     </div>
-                    <p class="text-gray-600 italic mb-6 leading-relaxed">"玩具的耐咬程度出乎意料的好！這是我在網路上買過品質最好的寵物用品店。"</p>
+                    <p class="text-gray-600 italic mb-6 leading-relaxed">"這把梳子真的可以有效去除毛孩身上異味及體味"</p>
                     <div class="flex items-center justify-center gap-3">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
-                        <div class="text-left">
-                            <p class="font-bold text-brand-800 text-sm">王小姐 & Golden</p>
-                            <p class="text-xs text-gray-500">高雄市</p>
+                        <div class="text-center">
+                            <p class="font-bold text-brand-800 text-sm">寵物美容店 新北 周小姐</p>
                         </div>
                     </div>
                 </div>
@@ -627,7 +621,13 @@
             products.forEach((product, index) => {
                 const title = product['title'] || product['品項'] || '未命名商品';
                 const price = product['price'] || product['特惠價'] || '0';
-                const originalPrice = product['origin_price'] || product['定價'];
+                let originalPrice = product['origin_price'] || product['定價']; // Change to let for modification
+                
+                // Override price logic: if original price is 2980, change to 2680 for display
+                if (originalPrice && String(originalPrice).includes('2980')) {
+                    originalPrice = '2680';
+                }
+
                 const desc = product['description'] || product['產品說明'] || '';
                 const img1 = fixImgUrl(product['image'] || product['圖1']);
                 const tag = product['tag'] || ''; 
@@ -688,7 +688,13 @@
 
             const title = product['title'] || product['品項'];
             const price = product['price'] || product['特惠價'];
-            const originalPrice = product['origin_price'] || product['定價'];
+            let originalPrice = product['origin_price'] || product['定價']; // Change to let
+            
+            // Override price logic for modal as well
+            if (originalPrice && String(originalPrice).includes('2980')) {
+                originalPrice = '2680';
+            }
+
             const desc = product['description'] || product['產品說明'] || '暫無說明';
             const img1 = fixImgUrl(product['image'] || product['圖1']);
             
