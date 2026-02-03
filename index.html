@@ -35,7 +35,7 @@
                         },
                         accent: {
                             light: '#fdf6e3', // 奶油色
-                            DEFAULT: '#d97706', // 溫暖橘 (點綴)
+                            DEFAULT: '#d97706', // 溫暖橘 (點綴，用於強調重點)
                         },
                         line: {
                             DEFAULT: '#06C755', // LINE 官方綠色
@@ -97,16 +97,8 @@
         </span>
     </a>
 
-    <!-- 購物車通知 Toast -->
-    <div id="toast" class="fixed top-24 right-5 z-50 bg-white border-l-4 border-brand-500 shadow-xl rounded-md p-4 hidden flex items-center gap-3 transform transition-all duration-300 translate-x-full">
-        <div class="text-brand-500">
-            <i data-lucide="check-circle" class="w-6 h-6"></i>
-        </div>
-        <div>
-            <h4 class="font-bold text-sm text-gray-800">已加入購物車</h4>
-            <p class="text-xs text-gray-500" id="toast-message">商品已成功加入您的購物籃。</p>
-        </div>
-    </div>
+    <!-- 購物車通知 Toast (隱藏，因為直接跳轉) -->
+    <div id="toast" class="hidden"></div>
 
     <!-- Navigation 導航列 -->
     <header class="fixed w-full z-40 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-sm" id="navbar">
@@ -129,13 +121,14 @@
                     <a href="#categories" class="hover:text-brand-500 transition-colors">熱門分類</a>
                     <a href="#products" class="hover:text-brand-500 transition-colors">精選商品</a>
                     <a href="#story" class="hover:text-brand-500 transition-colors">品牌故事</a>
+                    <a href="#distributor" class="text-accent hover:text-yellow-600 font-bold transition-colors">經銷商專區</a>
                 </nav>
 
                 <!-- Icons -->
                 <div class="flex items-center gap-4 text-brand-800">
-                    <button class="relative hover:text-brand-500 transition group" id="cart-btn">
+                    <button class="relative hover:text-brand-500 transition group" id="cart-btn" onclick="addToCart()">
                         <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                        <span id="cart-count" class="absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                        <!-- Cart count removed since we link out -->
                     </button>
                 </div>
             </div>
@@ -148,6 +141,7 @@
                 <a href="#categories" class="hover:text-brand-500">熱門分類</a>
                 <a href="#products" class="hover:text-brand-500">精選商品</a>
                 <a href="#story" class="hover:text-brand-500">品牌故事</a>
+                <a href="#distributor" class="text-accent font-bold">經銷商專區</a>
             </nav>
         </div>
     </header>
@@ -183,7 +177,6 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
                 <div class="p-6">
                     <div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-600">
-                        <!-- Icon changed to sparkle/tech related -->
                         <i data-lucide="sparkles" class="w-8 h-8"></i>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-brand-800">智能科技護理</h3>
@@ -367,7 +360,7 @@
         </div>
     </section>
 
-    <!-- Newsletter 電子報 (改為 LINE OA) -->
+    <!-- Newsletter / LINE OA -->
     <section class="py-16 bg-brand-800 text-white relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div class="container mx-auto px-6 relative z-10 text-center">
@@ -380,6 +373,42 @@
                 </svg>
                 加入 官方LINE
             </a>
+        </div>
+    </section>
+
+    <!-- 經銷商專區 (Distributor Zone - NEW) -->
+    <section id="distributor" class="py-20 bg-accent text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/10"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+           <div class="flex flex-col md:flex-row items-center justify-between gap-10">
+               <div class="md:w-2/3 text-center md:text-left">
+                   <h2 class="text-3xl md:text-4xl font-serif font-bold mb-4 text-brand-900 drop-shadow-sm">誠徵全球經銷夥伴</h2>
+                   <p class="text-lg text-brand-800 mb-6 font-medium">我們擁有台、美、中多國專利技術，致力於打造市場差異化的寵物護理科技。<br class="hidden md:block">如果您也認同我們的理念，歡迎加入 Body & Pet Comb. 的行列。</p>
+                   
+                   <!-- Benefits -->
+                   <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                       <div class="flex items-center gap-2 bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm text-brand-900 font-bold shadow-sm">
+                           <i data-lucide="check-circle" class="w-5 h-5"></i> 獨家專利技術
+                       </div>
+                       <div class="flex items-center gap-2 bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm text-brand-900 font-bold shadow-sm">
+                           <i data-lucide="trending-up" class="w-5 h-5"></i> 藍海市場商機
+                       </div>
+                       <div class="flex items-center gap-2 bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm text-brand-900 font-bold shadow-sm">
+                           <i data-lucide="shield" class="w-5 h-5"></i> 完整售後保固
+                       </div>
+                   </div>
+               </div>
+               
+               <!-- CTA Button -->
+               <div class="md:w-1/3 text-center">
+                   <a href="mailto:david492727@gmail.com" class="inline-block px-8 py-4 bg-brand-900 text-white font-bold text-lg rounded-full shadow-xl hover:bg-brand-800 transition transform hover:-translate-y-1 hover:scale-105 border-2 border-transparent hover:border-brand-300">
+                       立即洽詢經銷
+                   </a>
+                   <p class="mt-3 text-brand-900 text-sm opacity-80">或來信 david492727@gmail.com</p>
+               </div>
+           </div>
         </div>
     </section>
 
@@ -422,6 +451,7 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="#story" class="hover:text-white transition">品牌故事</a></li>
                         <li><a href="#" class="hover:text-white transition">隱私權政策</a></li>
+                        <li><a href="#distributor" class="hover:text-accent transition font-bold text-accent">經銷商專區</a></li>
                     </ul>
                 </div>
 
@@ -707,7 +737,7 @@
                         <!-- Add to Cart Button -->
                         <button onclick="addToCart('${title}'); closeModal()" class="w-full bg-brand-800 text-white py-4 rounded-full hover:bg-brand-600 transition font-bold shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-1 active:scale-95 duration-200">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
-                            放入購物車
+                            前往蝦皮購買
                         </button>
 
                         <!-- Long Strip Images Area -->
@@ -742,23 +772,11 @@
             }, 300);
         }
 
-        // Cart Logic
-        let cartCountNum = 0;
+        // Cart Logic (Modified for Shopee Link)
+        let cartCountNum = 0; 
         function addToCart(title) {
-            cartCountNum++;
-            const badge = document.getElementById('cart-count');
-            badge.innerText = cartCountNum;
-            badge.classList.remove('opacity-0');
-            
-            const toast = document.getElementById('toast');
-            const msg = document.getElementById('toast-message');
-            msg.innerText = `已將「${title}」加入購物車`;
-            toast.classList.remove('hidden', 'translate-x-full');
-            toast.classList.add('translate-x-0');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-            }, 3000);
+            // Direct to Shopee
+            window.open('https://shopee.tw/product/1638559741/48454722574/', '_blank');
         }
 
         // Initialize Fetch
