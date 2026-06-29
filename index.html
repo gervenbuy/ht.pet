@@ -531,6 +531,20 @@
         const API_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=工作表1`;
         let allProducts = [];
 
+        // 預設導購連結（當 Sheet 該列沒有填寫「連結」欄位時使用）
+        const DEFAULT_BUY_LINK = 'https://shopee.tw/product/1638559741/48454722574/';
+
+        // 從商品物件中取出導購連結（支援多種欄位命名）
+        function getProductLink(product) {
+            const link = product['連結'] || product['購買連結'] || product['link'] || product['導購連結'] || '';
+            return (link && String(link).trim() !== '') ? String(link).trim() : DEFAULT_BUY_LINK;
+        }
+
+        // 簡單轉義，避免商品名稱含有單引號或雙引號破壞 onclick 字串
+        function escapeForJsString(str) {
+            return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
         // Fetch Data
         async function fetchProducts() {
             const grid = document.getElementById('product-grid');
@@ -632,6 +646,9 @@
                 const desc = product['description'] || product['產品說明'] || '';
                 const img1 = fixImgUrl(product['image'] || product['圖1']);
                 const tag = product['tag'] || ''; 
+                const buyLink = getProductLink(product);
+                const safeTitle = escapeForJsString(title);
+                const safeLink = escapeForJsString(buyLink);
                 
                 // Tag Logic
                 let tagHtml = '';
@@ -649,7 +666,7 @@
                         <div class="relative h-64 overflow-hidden bg-gray-100">
                             <img src="${img1}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
                             ${tagHtml}
-                            <button onclick="event.stopPropagation(); addToCart('${title}')" class="absolute bottom-3 right-3 bg-white p-3 rounded-full shadow-md text-brand-800 hover:bg-brand-500 hover:text-white transition translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 duration-300 z-10">
+                            <button onclick="event.stopPropagation(); addToCart('${safeTitle}', '${safeLink}')" class="absolute bottom-3 right-3 bg-white p-3 rounded-full shadow-md text-brand-800 hover:bg-brand-500 hover:text-white transition translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 duration-300 z-10">
                                 <i data-lucide="shopping-cart" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -698,6 +715,9 @@
 
             const desc = product['description'] || product['產品說明'] || '暫無說明';
             const img1 = fixImgUrl(product['image'] || product['圖1']);
+            const buyLink = getProductLink(product);
+            const safeTitle = escapeForJsString(title);
+            const safeLink = escapeForJsString(buyLink);
             
             // 🔥 新增 image2 讀取 (支援長條圖)
             const img2 = fixImgUrl(product['image2'] || product['img2'] || product['圖2'] || product['圖2-說明圖']); 
@@ -742,7 +762,7 @@
                         <p class="text-gray-600 leading-relaxed mb-8 text-lg whitespace-pre-line">${desc}</p>
                         
                         <!-- Add to Cart Button -->
-                        <button onclick="addToCart('${title}'); closeModal()" class="w-full bg-brand-800 text-white py-4 rounded-full hover:bg-brand-600 transition font-bold shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-1 active:scale-95 duration-200">
+                        <button onclick="addToCart('${safeTitle}', '${safeLink}'); closeModal()" class="w-full bg-brand-800 text-white py-4 rounded-full hover:bg-brand-600 transition font-bold shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-1 active:scale-95 duration-200">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
                             前往蝦皮購買
                         </button>
@@ -779,11 +799,12 @@
             }, 300);
         }
 
-        // Cart Logic (Modified for Shopee Link)
+        // Cart Logic (Modified for Dynamic Buy Link)
         let cartCountNum = 0; 
-        function addToCart(title) {
-            // Direct to Shopee
-            window.open('https://shopee.tw/product/1638559741/48454722574/', '_blank');
+        function addToCart(title, link) {
+            // 如果有提供連結就用該連結，否則用預設連結（向後兼容舊資料）
+            const targetUrl = (link && String(link).trim() !== '') ? String(link).trim() : DEFAULT_BUY_LINK;
+            window.open(targetUrl, '_blank');
         }
 
         // Initialize Fetch
