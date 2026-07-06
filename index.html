@@ -716,8 +716,10 @@
             const desc = product['description'] || product['產品說明'] || '暫無說明';
             const img1 = fixImgUrl(product['image'] || product['圖1']);
             const buyLink = getProductLink(product);
+            const ctaText = product['按鈕文字'] || product['cta'] || product['CTA'] || '立即下單';
             const safeTitle = escapeForJsString(title);
             const safeLink = escapeForJsString(buyLink);
+            const safeCta = escapeForJsString(ctaText);
             
             // 🔥 新增 image2 讀取 (支援長條圖)
             const img2 = fixImgUrl(product['image2'] || product['img2'] || product['圖2'] || product['圖2-說明圖']); 
@@ -764,7 +766,7 @@
                         <!-- Add to Cart Button -->
                         <button onclick="addToCart('${safeTitle}', '${safeLink}'); closeModal()" class="w-full bg-brand-800 text-white py-4 rounded-full hover:bg-brand-600 transition font-bold shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-1 active:scale-95 duration-200">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
-                            立即下單
+                            ${ctaText}
                         </button>
 
                         <!-- Long Strip Images Area -->
